@@ -2,9 +2,10 @@ from django.db import models
 from django.urls import reverse
 import uuid
 import datetime
+from django.utils.html import format_html
 # Create your models here.
 def get_smo():
-    f = open('C:/Users/Leo/detralex/catalog/reestSMO.csv', 'r', encoding = 'utf-8')
+    f = open('C:/Users/sigur/detralex/mis/catalog/reestSMO.csv', 'r', encoding = 'utf-8')
     content = f.readlines()
     SMO_ = []
     for line in content:
@@ -19,9 +20,9 @@ class Patient(models.Model):
     Model representing a patient
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, help_text="ID пациента")
-    first_name = models.CharField("Имя",max_length=200)
-    last_name = models.CharField("Фамилия",max_length=200)
-    patronym = models.CharField("Отчество",max_length=200)
+    first_name = models.CharField("Имя",max_length=25)
+    last_name = models.CharField("Фамилия",max_length=25)
+    patronym = models.CharField("Отчество",max_length=25)
     SEX = (
         ('1', 'Мужской'),
         ('2', 'Женский'),
@@ -41,6 +42,7 @@ class Patient(models.Model):
     smo = models.CharField("СМО",max_length=50, choices=SMO__, blank=True, help_text='Страховая медицинская организация')
     oms = models.CharField('ОМС',max_length=20, help_text='Номер ОМС')
     date = models.DateField(("Дата рождения"), default=datetime.date.today)
+    colored_id = format_html('<span style="color:#0045;">{}</span>',id)
     class Meta:
         ordering = ["last_name"]
         verbose_name_plural = 'Пациенты'
@@ -90,6 +92,7 @@ class Case(models.Model):
         ('6', 'Летальный исход'),
     ]
     result = models.CharField('Результат',max_length=2, choices=RESULTS, blank=True, help_text='Исход случая')
+    
     # character = 
     # diagnosis = 
     class Meta:
@@ -132,4 +135,5 @@ class Visit(models.Model):
         """
         String for representing the Model object.
         """
-        return '%s, %s' % (self.id, self.first_date)
+        return '%s, %s' % (self.id, self.date)
+

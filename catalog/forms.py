@@ -1,7 +1,8 @@
 from dal import autocomplete
 
 from django import forms
-from catalog.models import Case,Diagnosis
+from catalog.models import Case, Diagnosis
+
 
 class Form(forms.ModelForm):
     diagnosis = forms.ModelChoiceField(

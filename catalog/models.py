@@ -6,7 +6,7 @@ from django.utils.html import format_html
 from django import forms
 # Create your models here.
 def get_smo():
-    f = open('C:/Users/Leo/django_mis/detralex/reestSMO.csv', 'r', encoding = 'utf-8')
+    f = open('C:/Users/Leo/django_mis/catalog/reestSMO.csv', 'r', encoding = 'utf-8')
     content = f.readlines()
     SMO_ = []
     for line in content:
@@ -20,7 +20,7 @@ class Patient(models.Model):
     """
     Model representing a patient
     """
-    id = models.AutoField(primary_key=True, help_text="ID пациента")
+    id = models.UUIDField(primary_key=True,default=uuid.uuid4(), help_text="ID пациента")
     first_name = models.CharField("Имя",max_length=25)
     last_name = models.CharField("Фамилия",max_length=25)
     patronym = models.CharField("Отчество",max_length=25,blank=True)
@@ -65,7 +65,7 @@ class Case(models.Model):
     Model representing a specific copy of a book (i.e. that can be borrowed from the library).
     """
     
-    id = models.AutoField(primary_key=True, help_text="ID случая")
+    id = models.UUIDField(primary_key=True,default=uuid.uuid4(), help_text="ID случая")
     id_p = models.ForeignKey('Patient',on_delete=models.SET_NULL, null=True)
     date = models.DateField(("Дата открытия"), default=datetime.date.today)
     REASONS = [
@@ -116,7 +116,7 @@ class Visit(models.Model):
     """
     Model representing an author.
     """
-    id = models.AutoField(primary_key=True, help_text="ID посещения")
+    id = models.UUIDField(primary_key=True,default=uuid.uuid4(),help_text="ID посещения")
     id_c = models.ForeignKey('Case',on_delete=models.SET_NULL, null=True)
     date = models.DateField(("Дата посещения"), default=datetime.date.today)
     # help_type = 

@@ -1,13 +1,12 @@
 from django.contrib import admin
-from .models import Patient, Case, Visit
-from django.contrib.admin.views.decorators import staff_member_required
+from catalog.models import Patient, Case, Visit, Diagnosis
 from django.utils.html import format_html
 # admin.site.register(Patient)
 #admin.site.register(Case)
 @admin.register(Visit)
 class VisitAdmin(admin.ModelAdmin):
     readonly_fields =('id',)
-    list_display =  ('date', 'id_c',)
+    list_display = ('date', 'id_c',)
     
 class VisitInline(admin.TabularInline):
     model = Visit
@@ -18,13 +17,23 @@ class VisitInline(admin.TabularInline):
     can_delete = False
     show_change_link = True
 
-@admin.register(Case)
+# @admin.register(Case)
+
+from catalog.forms import Form
+
 class CaseAdmin(admin.ModelAdmin):
     readonly_fields =('id',)
-    list_display =  ('date', 'id')
+    list_display =  ('date', 'id',)
     date_hierarchy = 'date'
     inlines = [VisitInline]
-    
+    #admin.ModelAdmin.filter_horizontal = ('diagnosis',  )
+    form = Form
+#
+# class CollectionAdmin(admin.ModelAdmin):
+#     filter_horizontal = ('author',)
+ 
+admin.site.register(Case, CaseAdmin)
+
 class CaseInline(admin.TabularInline):
     model = Case
     extra = 0
@@ -51,9 +60,8 @@ class PatientAdmin(admin.ModelAdmin):
     list_display = ('id', 'first_name', 'last_name', 'date', 'oms')
     inlines = [CaseInline]
 
-@staff_member_required
-def staff_view(redirect_field_name='patient',login_url='admin:leo'):
-    ...
+
+admin.site.register(Diagnosis)
 # Register the Admin classes for BookInstance using the decorator
 
 

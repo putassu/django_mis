@@ -2,12 +2,17 @@ from django.urls import path
 from django.conf.urls import url
 
 
-from catalog.views import DiagnosisAutocomplete
+from catalog.views import DiagnosisAutocomplete, ServicesAutocomplete
 
 urlpatterns = [
     url(
-        r'^country-autocomplete/$',
+        r'^diagnosis-autocomplete/$',
         DiagnosisAutocomplete.as_view(),
-        name='country-autocomplete',
+        name='diagnosis-autocomplete',
+    ),
+    url(
+        r'^services-autocomplete/$',
+        ServicesAutocomplete.as_view(),
+        name='services-autocomplete',
     ),
 ]

@@ -20,7 +20,7 @@ class Patient(models.Model):
     """
     Model representing a patient
     """
-    id = models.UUIDField(primary_key=True,default=uuid.uuid4(), help_text="ID пациента")
+    id = models.AutoField(primary_key=True,help_text="ID пациента")
     first_name = models.CharField("Имя",max_length=25)
     last_name = models.CharField("Фамилия",max_length=25)
     patronym = models.CharField("Отчество",max_length=25,blank=True)
@@ -51,7 +51,7 @@ class Patient(models.Model):
         """
         String for representing the Model object.
         """
-        return '%s (%s %s)' % (self.id,self.first_name,self.last_name)
+        return '%s %s (%s) г.р.' % (self.first_name,self.last_name, self.date)
 
 
     def get_absolute_url(self):
@@ -64,9 +64,9 @@ class Case(models.Model):
     """
     Model representing a specific copy of a book (i.e. that can be borrowed from the library).
     """
-    
-    id = models.UUIDField(primary_key=True,default=uuid.uuid4(), help_text="ID случая")
-    id_p = models.ForeignKey('Patient',on_delete=models.SET_NULL, null=True)
+
+    id = models.AutoField(primary_key=True, help_text="ID случая")
+    id_p = models.ForeignKey('Patient',verbose_name="ID пациента",on_delete=models.SET_NULL, null=True)
     date = models.DateField(("Дата открытия"), default=datetime.date.today)
     REASONS = [
         ('1', 'Лечебно-диагностический прием '),
@@ -94,11 +94,17 @@ class Case(models.Model):
         ('6', 'Летальный исход'),
     ]
     result = models.CharField('Результат',max_length=2, choices=RESULTS, blank=True, help_text='Исход случая')
-    diagnosis = models.ForeignKey('Diagnosis', on_delete=models.SET_NULL, null=True, help_text="Выберите диагноз")
-    # character = 
-    # diagnosis = 
+    diagnosis = models.ForeignKey('Diagnosis',verbose_name="Диагноз", on_delete=models.SET_NULL, null=True, help_text="Выберите диагноз")
+    CHARACTER = [
+        ('1', 'Впервые в жизни установленное хроническое'),
+        ('2', 'Ранее установленное хроническое'),
+        ('3', 'Острое'),
+    ]
+    character = models.CharField('Характер заболевания', max_length=2, choices=CHARACTER, blank=True,
+                                 help_text='Характер заболевания')
+    # diagnosis =
     class Meta:
-        ordering = ["date"]
+        ordering = ["-date"]
         verbose_name_plural = 'Случаи'
         verbose_name = 'случай'
     def get_absolute_url(self):
@@ -110,20 +116,36 @@ class Case(models.Model):
         """
         String for representing the Model object
         """
-        return '%s (%s) ' % (self.date,self.id_p.first_name)
+        try:
+            fn = self.id_p.first_name
+        except:
+            fn = 'Здесь ничего нет'
+        return '%s (%s) ' % (self.date,fn)
 
 class Visit(models.Model):
     """
     Model representing an author.
     """
-    id = models.UUIDField(primary_key=True,default=uuid.uuid4(),help_text="ID посещения")
-    id_c = models.ForeignKey('Case',on_delete=models.SET_NULL, null=True)
+    id = models.AutoField(primary_key=True,help_text="ID посещения")
+    id_c = models.ForeignKey('Case',verbose_name="ID случая",on_delete=models.SET_NULL, null=True)
+    services = models.ForeignKey('Service',verbose_name="Услуга",on_delete=models.SET_NULL, null=True)
     date = models.DateField(("Дата посещения"), default=datetime.date.today)
-    # help_type = 
+    HELPTYPE = [('10', 'Первичная медико-санитарная помощь'),
+                ('1', 'Первичная доврачебная медико-санитарная помощь'),
+                ('2', 'Первичная врачебная медико-санитарная помощь'),
+                ('3', 'Первичная специализированная медико-санитарная помощь'),
+                ('4', 'Специализированная медицинская помощь'),
+                ('8', 'Высокотехнологичная специализированная медицинская помощь'),
+                ('6', 'Паллиативная медицинская помощь'),
+                ('5', 'Скорая медицинская помощь'),
+                ('7', 'Иные'),
+                ]
+    help_type = models.CharField('Вид оказываемой помощи', max_length=2, choices=HELPTYPE, blank=True,
+                                 help_text='Вид оказываемой помощи')
     # visit_type = 
     # place = 
     class Meta:
-        ordering = ["date"]
+        ordering = ["-date"]
         verbose_name_plural = 'Посещения'
         verbose_name = 'посещение'
     def get_absolute_url(self):
@@ -137,19 +159,93 @@ class Visit(models.Model):
         """
         String for representing the Model object.
         """
-        return '%s, %s' % (self.id, self.date)
+        return '%s, %s' % (self.services, self.date)
 
 class Diagnosis(models.Model):
     """
     Model representing a book genre (e.g. Science Fiction, Non Fiction).
     """
-    code = models.CharField(primary_key=True,max_length=20, help_text="Код болезни")
-    name = models.CharField(max_length=200, help_text="Название болезни")
+    code = models.CharField(primary_key=True,verbose_name='Код болезни(МКБ-10)',max_length=20, help_text="Код болезни")
+    name = models.CharField(max_length=200,verbose_name='Название болезни(МКБ-10)', help_text="Название болезни")
+
+    class Meta:
+        ordering = ["-name"]
+        verbose_name_plural = 'Диагнозы'
+        verbose_name = 'Диагноз'
     def __str__(self):
         """
         String for representing the Model object (in Admin site etc.)
         """
         return '%s, %s' % (self.code, self.name)
+
+class Service(models.Model):
+    """
+    Model representing an author.
+    """
+    id = models.CharField(max_length=20,verbose_name="Код услуги",primary_key=True,help_text="Код услуги")
+    # id_v = models.ForeignKey('Visit',verbose_name="ID посещения",on_delete=models.SET_NULL, null=True)
+    # date = models.ForeignKey('Visit', default=datetime.date.today)
+    services = models.CharField(verbose_name="Название услуги",max_length=200, help_text="Название услуги")
+    class Meta:
+        # ordering = ["-date"]
+        verbose_name_plural = 'Услуги'
+        verbose_name = 'услугу'
+    def get_absolute_url(self):
+        """
+        Returns the url to access a particular author instance.
+        """
+        return reverse('Услуга', args=[str(self.services)])
+
+
+    def __str__(self):
+        """
+        String for representing the Model object.
+        """
+        return '%s - %s' % (self.id, self.services)
+
+PATIENTS = [tuple((str(pat), (str(pat)))) for pat in list(Patient.objects.all())]
+PATIENTS.append(tuple(('Нет записи', 'Нет записи')))
+print(PATIENTS)
+
+class Schedule(models.Model):
+    """
+    Model representing an author.
+    """
+    PATIENTS = [tuple((str(pat), (str(pat)))) for pat in list(Patient.objects.all())]
+    PATIENTS.append(tuple(('Нет записи', 'Нет записи')))
+    date = models.DateField(("Дата посещения"),primary_key=True, default=datetime.date.today)
+    id_10_00 = models.CharField(max_length=50,choices=PATIENTS,verbose_name="10:00", null=True, default='Нет записи')
+    id_10_20 = models.CharField(max_length=50,choices=PATIENTS, verbose_name="10:20", null=True, default='Нет записи')
+    id_10_40 = models.CharField(max_length=50, choices=PATIENTS, verbose_name="10:40", null=True, default='Нет записи')
+    id_11_00= models.CharField(max_length=50, choices=PATIENTS, verbose_name="11:00", null=True, default='Нет записи')
+    id_11_20 = models.CharField(max_length=50, choices=PATIENTS, verbose_name="11:20", null=True, default='Нет записи')
+    id_11_40 = models.CharField(max_length=50, choices=PATIENTS, verbose_name="11:40", null=True, default='Нет записи')
+    id_13_00 = models.CharField(max_length=50, choices=PATIENTS, verbose_name="13:00", null=True, default='Нет записи')
+    id_13_20 = models.CharField(max_length=50, choices=PATIENTS, verbose_name="13:20", null=True, default='Нет записи')
+    id_13_40 = models.CharField(max_length=50, choices=PATIENTS, verbose_name="13:40", null=True, default='Нет записи')
+    id_14_00 = models.CharField(max_length=50, choices=PATIENTS, verbose_name="14:00", null=True, default='Нет записи')
+    id_14_20 = models.CharField(max_length=50, choices=PATIENTS, verbose_name="14:20", null=True, default='Нет записи')
+    id_14_40 = models.CharField(max_length=50, choices=PATIENTS, verbose_name="14:40", null=True, default='Нет записи')
+
+    class Meta:
+        ordering = ["-date"]
+        verbose_name_plural = 'Смены'
+        verbose_name = 'Смену'
+    def get_absolute_url(self):
+        """
+        Returns the url to access a particular author instance.
+        """
+        return reverse('Смены', args=[str(self.date)])
+
+
+    def __str__(self):
+        """
+        String for representing the Model object.
+        """
+        return '%s %s %s %s %s %s %s %s %s %s %s' % (self.date, self.id_10_00, self.id_10_20, self.id_10_40,
+                                               self.id_11_00, self.id_11_20, self.id_11_40, self.id_13_00,
+                                               self.id_13_20, self.id_13_40, self.id_14_00)
+
 
 # with open('C:/Users/Leo/django_mis/catalog/diagnosis.csv', 'r', encoding='utf-8') as f:
 #     content = f.readlines()
@@ -161,5 +257,18 @@ class Diagnosis(models.Model):
 #         lines = line.split(';')
 #         name_ = lines[1].strip('"""')
 #         code_ = lines[2]
+#         print('извлёк ', code_, name_)
 #         d = Diagnosis(name=name_,code=code_)
 #         d.save()
+#with open('C:/Users/Leo/django_mis/catalog/services.csv', 'r', encoding='utf-8') as f:
+    # content = f.readlines()
+    # i=0
+    # for line in content:
+    #     i+=1
+    #     if i < 3:
+    #         continue
+    #     lines = line.split(';')
+    #     name_ = lines[2].strip("'")
+    #     code_ = lines[1].strip("'")
+    #     s = Service(id=code_, service=name_)
+    #     s.save()

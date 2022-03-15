@@ -51,7 +51,7 @@ admin.site.register(Visit, VisitAdmin)
 
 class CaseAdmin(admin.ModelAdmin):
     # readonly_fields =('id',)
-    list_display = ('date', 'character', 'reason', 'result', 'diagnosis')
+    list_display = ('date', 'character', 'reason', 'result', 'diagnosis','doctor')
     date_hierarchy = 'date'
     exclude = ('id',)
     inlines = [VisitInline]
@@ -94,9 +94,6 @@ class PatientAdmin(admin.ModelAdmin):
 
 admin.site.register(Diagnosis)
 # Register the Admin classes for BookInstance using the decorator
-
-
-
 
 
 

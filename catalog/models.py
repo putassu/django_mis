@@ -1,10 +1,12 @@
 from django.db import models
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 import uuid
 import datetime
+from django.contrib.auth.models import User
 from django.utils.html import format_html
 from django import forms
 # Create your models here.
+app_name = 'calalog'
 def get_smo():
     f = open('C:/Users/Leo/django_mis/catalog/reestSMO.csv', 'r', encoding = 'utf-8')
     content = f.readlines()
@@ -58,7 +60,7 @@ class Patient(models.Model):
         """
         Returns the url to access a particular book instance.
         """
-        return reverse('Перейти к пациенту', args=[str(self.id)])
+        return reverse('catalog:patient-detail', args=[str(self.id)])
 
 class Case(models.Model):
     """
@@ -102,16 +104,13 @@ class Case(models.Model):
     ]
     character = models.CharField('Характер заболевания', max_length=2, choices=CHARACTER, blank=True,
                                  help_text='Характер заболевания')
+    doctor = models.ForeignKey(User,verbose_name="Врач", on_delete=models.SET_NULL, null=True, help_text="Врач")
     # diagnosis =
     class Meta:
         ordering = ["-date"]
         verbose_name_plural = 'Случаи'
         verbose_name = 'случай'
-    def get_absolute_url(self):
-        """
-        Returns the url to access a particular author instance.
-        """
-        return reverse('Перейти к случаю', args=[str(self.id)])
+
     def __str__(self):
         """
         String for representing the Model object
@@ -121,6 +120,13 @@ class Case(models.Model):
         except:
             fn = 'Здесь ничего нет'
         return '%s (%s) ' % (self.date,fn)
+
+    def get_absolute_url(self):
+        """
+        Returns the url to access a particular author instance.
+        """
+        # print(reverse('catalog:case-detail', args=[str(self.id)]))
+        return f'/{app_name}/case-{self.id}/'
 
 class Visit(models.Model):
     """
@@ -152,7 +158,7 @@ class Visit(models.Model):
         """
         Returns the url to access a particular author instance.
         """
-        return reverse('Посещение', args=[str(self.id)])
+        return reverse('catalog:visit-detail', args=[str(self.id)])
 
 
     def __str__(self):
@@ -177,6 +183,13 @@ class Diagnosis(models.Model):
         String for representing the Model object (in Admin site etc.)
         """
         return '%s, %s' % (self.code, self.name)
+    def get_absolute_url(self):
+        """
+        Returns the url to access a particular author instance.
+        """
+        # return reverse('catalog:diagnosis', args=[str(self.code)])
+
+        return reverse('catalog:diagnosis', args=[str(self.code)])
 
 class Service(models.Model):
     """
@@ -194,7 +207,7 @@ class Service(models.Model):
         """
         Returns the url to access a particular author instance.
         """
-        return reverse('Услуга', args=[str(self.services)])
+        return reverse('catalog:service', args=[str(self.services)])
 
 
     def __str__(self):
@@ -202,10 +215,10 @@ class Service(models.Model):
         String for representing the Model object.
         """
         return '%s - %s' % (self.id, self.services)
-
-PATIENTS = [tuple((str(pat), (str(pat)))) for pat in list(Patient.objects.all())]
-PATIENTS.append(tuple(('Нет записи', 'Нет записи')))
-print(PATIENTS)
+#
+# PATIENTS = [tuple((str(pat), (str(pat)))) for pat in list(Patient.objects.all())]
+# PATIENTS.append(tuple(('Нет записи', 'Нет записи')))
+# print(PATIENTS)
 
 class Schedule(models.Model):
     """
@@ -235,7 +248,7 @@ class Schedule(models.Model):
         """
         Returns the url to access a particular author instance.
         """
-        return reverse('Смены', args=[str(self.date)])
+        return reverse('catalog:schedule', args=[str(self.date)])
 
 
     def __str__(self):
@@ -272,3 +285,6 @@ class Schedule(models.Model):
     #     code_ = lines[1].strip("'")
     #     s = Service(id=code_, service=name_)
     #     s.save()
+class UserLastName(User):
+    def __str__(self):
+        return f'{self.first_name} {self.last_name}'

@@ -1,0 +1,16 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h1>Расписание</h1>
+
+    <ul>
+
+      {% for sh in shedule_list %}
+      <li>
+        <a href="{{ sh.get_absolute_url }}">{{ sh.id_10_00 }} {{ sh.id_10_30 }} {{ sh.id_11_00 }} </a> ({{ sh.id_11_30 }})
+      </li>
+      <br>
+      {% endfor %}
+
+    </ul>
+{% endblock %}

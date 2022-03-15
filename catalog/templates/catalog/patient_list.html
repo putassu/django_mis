@@ -1,0 +1,27 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h1>Пациенты</h1>
+
+    {% if patient_list %}
+    <ul>
+
+      {% for patient in patient_list %}
+      <li>
+        <a href="{{ patient.get_absolute_url }}">{{ patient.last_name }} {{ patient.first_name }} {{ patient.patronym }} </a> ({{patient.date}})
+      </li>
+      <li>Полис ОМС: {{ patient.oms }}</li>
+      {% if patient.disability %}
+      <li>Инвалидность: {{ patient.disability }}</li>
+      {% endif %}
+      <br>
+      <br>
+      {% endfor %}
+{% if perms.catalog.can_delete %}
+   <<li>eeeeeeeeeeeeeeeeeeeeeeeeeeeeeee</li>
+   {% endif %}
+    </ul>
+    {% else %}
+      <p>Пациентов пока нет</p>
+    {% endif %} 
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<h1>Главная страница</h1>
+
+  <p>Добро пожаловать в медицинскую информационную систему <em>ДЕТРАЛЕКС</em>, смена {{ current_date }}</p>
+
+<h2>Статистика</h2>
+
+  <p>На сегодняшний день у вас({{ us.username }}):</p>
+  <ul>
+    <li><strong>Всего пациентов:</strong> {{ num_patients }}</li>
+    <li><strong>Моих случаев:</strong> {{ num_cases_leo }}</li>
+    <li><strong>Выполненных посещений:</strong> {{ num_visits }}</li>
+    <li><strong>Оказанных услуг:</strong> {{ num_services }}</li>
+    <li class='text-warning'><strong>Случаев по больнице:</strong> {{ num_cases }}</li>
+  </ul>
+<!-- <p>Номер посещения страницы: {{ count_visits }}</p>-->
+{% endblock %}

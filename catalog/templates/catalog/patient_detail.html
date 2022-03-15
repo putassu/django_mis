@@ -1,0 +1,24 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>{{ patient.last_name }} {{ patient.first_name }} {{ patient.patronym }} ({{patient.date}}) г.р.</h1>
+
+  <p><strong>Случаи:</strong> <a href="">{{ patient.case_set.all.count }}</a></p> <!-- author detail link not yet defined -->
+  <p><strong>СМО:</strong> {{ patient.get_smo_display }}</p>
+<!--  <p><strong>Посещения:</strong> {% for visit in visits %} {{ visit }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>-->
+
+  <div style="margin-left:20px;margin-top:20px">
+    <h4>Случаи</h4>
+    {% for case in patient.case_set.all %}
+    <hr>
+    <p class="{% if copy.status == 'a' %}text-success{% elif copy.status == 'd' %}text-danger{% else %}text-warning{% endif %}">{{ case.get_date_display }}</p>
+    <p><strong>Причина:</strong> {{ case.get_reason_display }}</p>
+    <p><strong>Результат:</strong> {{case.get_result_display}}</p>
+    <p><strong>Диагноз:</strong> {{case.diagnosis}}</p>
+    <p><strong>Характер заболевания:</strong> {{case.et_character_display}}</p>
+    <p class="text-muted"><strong>ID случая:</strong> {{case.id}}</p>
+    {% endfor %}
+    <h2><a href="{% url 'catalog:change_patient' patient.id %}">Изменить данные пациента</a></h2>
+  </div>
+{% endblock %}
+{% if perms.catalog.can_mark_returned %}- <a href="{% url 'renew-book-librarian' bookinst.id %}">Renew</a>  {% endif %}

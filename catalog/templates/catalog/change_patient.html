@@ -1,0 +1,14 @@
+{% extends "base_generic.html" %}
+{% block content %}
+
+    <h1>Пациент: {{patient.first_name}} {{patient.last_name}} {{ patient.patronym }}</h1>
+    <p>Изменить данные пациента</p>
+    <form action="" method="post">
+        {% csrf_token %}
+        <table>
+        {{ form }}
+        </table>
+        <input type="submit" value="Submit" />
+    </form>
+
+{% endblock %}

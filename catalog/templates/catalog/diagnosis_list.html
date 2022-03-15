@@ -1,0 +1,21 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h1>МКБ-10</h1>
+
+    {% if diagnosis_list %}
+    <ul>
+
+      {% for diagnosis in diagnosis_list %}
+      <hr>
+      <li>Код: {{ diagnosis.code }}</li>
+      <li>Диагноз: {{ diagnosis.name }}</li>
+      <br>
+      <br>
+      {% endfor %}
+
+    </ul>
+    {% else %}
+      <p>Диагнозов нет</p>
+    {% endif %} 
+{% endblock %}

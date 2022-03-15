@@ -1,0 +1,25 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h1>Случаи</h1>
+
+    {% if case_list %}
+    <ul>
+
+      {% for case in case_list %}
+      <li>
+        <a href="{{ case.get_absolute_url }}">id:{{ case.id }} дата:{{ case.date }} </a> врач:{{ case.doctor }}
+      </li>
+      <li>Повод обращения: {{ case.get_reason_display }}</li>
+      {% if case.result %}
+      <li>Результат: {{ case.get_result_display }}</li>
+      {% endif %}
+      <br>
+      <br>
+      {% endfor %}
+
+    </ul>
+    {% else %}
+      <p>Случаев пока нет</p>
+    {% endif %} 
+{% endblock %}
